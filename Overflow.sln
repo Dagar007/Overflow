@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Overflow.AppHost", "Overflow.AppHost\Overflow.AppHost.csproj", "{EDB2063E-C6DA-47A2-8E7D-19123D9663B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Overflow.ServiceDefaults", "Overflow.ServiceDefaults\Overflow.ServiceDefaults.csproj", "{8412959E-A14C-46DA-91CF-C4E9F0402F32}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EDB2063E-C6DA-47A2-8E7D-19123D9663B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDB2063E-C6DA-47A2-8E7D-19123D9663B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDB2063E-C6DA-47A2-8E7D-19123D9663B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDB2063E-C6DA-47A2-8E7D-19123D9663B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8412959E-A14C-46DA-91CF-C4E9F0402F32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8412959E-A14C-46DA-91CF-C4E9F0402F32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8412959E-A14C-46DA-91CF-C4E9F0402F32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8412959E-A14C-46DA-91CF-C4E9F0402F32}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
