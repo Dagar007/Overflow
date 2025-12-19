@@ -8,6 +8,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{80
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuestionService", "QuestionService\QuestionService.csproj", "{4EE08627-D147-4F2C-A7A8-B117ABDBAE90}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchService", "SearchService\SearchService.csproj", "{A760846C-73F5-4C3D-85E9-D0EC03ABD6B5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{CD270663-32A5-4599-9F5B-5C17B09989A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{DD64AD43-111C-42FF-883F-D9A0A6E2603E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,8 +32,18 @@ Global
 		{4EE08627-D147-4F2C-A7A8-B117ABDBAE90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EE08627-D147-4F2C-A7A8-B117ABDBAE90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EE08627-D147-4F2C-A7A8-B117ABDBAE90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A760846C-73F5-4C3D-85E9-D0EC03ABD6B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A760846C-73F5-4C3D-85E9-D0EC03ABD6B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A760846C-73F5-4C3D-85E9-D0EC03ABD6B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A760846C-73F5-4C3D-85E9-D0EC03ABD6B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD64AD43-111C-42FF-883F-D9A0A6E2603E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD64AD43-111C-42FF-883F-D9A0A6E2603E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD64AD43-111C-42FF-883F-D9A0A6E2603E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD64AD43-111C-42FF-883F-D9A0A6E2603E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4EE08627-D147-4F2C-A7A8-B117ABDBAE90} = {80EE4BC7-5C34-4C08-B429-2781A2C075F8}
+		{A760846C-73F5-4C3D-85E9-D0EC03ABD6B5} = {80EE4BC7-5C34-4C08-B429-2781A2C075F8}
+		{DD64AD43-111C-42FF-883F-D9A0A6E2603E} = {CD270663-32A5-4599-9F5B-5C17B09989A7}
 	EndGlobalSection
 EndGlobal
