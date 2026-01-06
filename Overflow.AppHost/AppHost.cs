@@ -56,13 +56,25 @@ var yarp = builder.AddYarp("gateway")
         yarpBuilder.AddRoute("/questions/{**catch-all}", questionService);
         yarpBuilder.AddRoute("/tags/{**catch-all}", questionService);
         yarpBuilder.AddRoute("/search/{**catch-all}", searchService);
-    })
-    .WithHostPort(8001)
-    .WithEnvironment("ASPNETCORE_URLS", "http://*:8001")
-    .WithEnvironment("VIRTUAL_HOST", "api.overflow.local")
-    .WithEnvironment("VIRTUAL_PORT", "8001")
-    .WithEndpoint(port: 8001, targetPort: 8001, scheme: "http",
-        name: "gateway", isExternal: true);
+    });
+
+if (builder.Environment.IsDevelopment())
+{
+    yarp.WithHostPort(8001);
+}
+else
+{
+   yarp
+   .WithEnvironment("ASPNETCORE_URLS", "http://*:8001")
+   .WithEndpoint(port: 8001, scheme: "http", targetPort: 8001, name: "gateway", isExternal: true)
+   .WithEnvironment("VIRTUAL_HOST", "api.overflow.local")
+   .WithEnvironment("VIRTUAL_PORT", "8001");
+}
+   
+
+var webapp = builder.AddNpmApp("webapp", "../webapp", "dev")
+    .WithReference(keycloak)
+    .WithHttpEndpoint(env: "PORT", port: 3000);
 
 if (!builder.Environment.IsDevelopment())
 {
