@@ -61,7 +61,7 @@ export default function SearchInput() {
                                 href={`/questions/${question.id}`}
                                 startContent={
                                     <div className='flex flex-col h-14 min-w-14 justify-center 
-                                        items-center border-success-50 rounded-md'>
+                                        items-center bg-success rounded-md'>
                                         <span>{question.answerCount}</span>
                                         <span className='text-xs'>answers</span>
                                     </div>
