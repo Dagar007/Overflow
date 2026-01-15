@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Contracts;
 using FastExpressionCompiler;
+using Ganss.Xss;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -30,10 +31,11 @@ public class QuestionsController(QuestionDbContext db, IMessageBus bus, TagServi
         
         if (userId is null || name is null)
             return BadRequest("Cannot get user details");
+        var sanitizer = new HtmlSanitizer();
         var question = new Question()
         {
             Title = dto.Title,
-            Content = dto.Content,
+            Content = sanitizer.Sanitize(dto.Content),
             TagSlugs = dto.Tags,
             AskerId = userId,
             AskerDisplayName = name
@@ -85,9 +87,9 @@ public class QuestionsController(QuestionDbContext db, IMessageBus bus, TagServi
         {
             return BadRequest("Invalid tags");
         }
-        
+        var sanitizer = new HtmlSanitizer();
         question.Title = dto.Title;
-        question.Content = dto.Content;
+        question.Content = sanitizer.Sanitize(dto.Content);
         question.TagSlugs = dto.Tags;
         question.UpdatedAt = DateTime.UtcNow;
 
@@ -125,9 +127,10 @@ public class QuestionsController(QuestionDbContext db, IMessageBus bus, TagServi
         
         if (userId is null || name is null)
             return BadRequest("Cannot get user details");
+        var sanitizer = new HtmlSanitizer();
         var answer = new Answer
         {
-            Content = answerDto.Content,
+            Content = sanitizer.Sanitize(answerDto.Content),
             CreatedAt = DateTime.UtcNow,
             QuestionId = questionId,
             UserId = userId,
@@ -150,7 +153,8 @@ public class QuestionsController(QuestionDbContext db, IMessageBus bus, TagServi
             return NotFound();
         if (answer.QuestionId != questionId)
             return BadRequest("Cannot update answer details");
-        answer.Content = answerDto.Content;
+        var sanitizer = new HtmlSanitizer();
+        answer.Content = sanitizer.Sanitize(answerDto.Content);
         answer.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync();
         return NoContent();

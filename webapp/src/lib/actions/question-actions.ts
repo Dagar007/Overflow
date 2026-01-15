@@ -1,7 +1,10 @@
 ﻿'use server';
 
-import {Question} from "@/lib/types";
+import {Answer, Question} from "@/lib/types";
 import {fetchClient} from "@/lib/FetchClient";
+import {QuestionSchema} from "@/lib/schemas/questionSchema";
+import {AnswerSchema} from "@/lib/schemas/answerSchema";
+import {revalidatePath} from "next/dist/server/web/spec-extension/revalidate";
 
 export async function getQuestions(tags?: string) {
     let url = '/questions';
@@ -17,4 +20,22 @@ export async function getQuestionById(id: string) {
 
 export async function searchQuestions(query: string) {
     return fetchClient<Question[]>(`/search?query=${query}`, 'GET')
+}
+
+export async function postQuestion(question: QuestionSchema) {
+    return fetchClient<Question>('/questions', 'POST', {body: question})
+}
+
+export async function updateQuestion(question: QuestionSchema, id: string) {
+    return fetchClient(`/questions/${id}`, 'PUT', {body: question}) 
+}
+
+export async function deleteQuestion(id: string) {
+    return fetchClient(`/questions/${id}`, 'DELETE')
+}
+
+export async function postAnswer(data: AnswerSchema, questionId: string) {
+    const result =  await fetchClient<Answer>(`/questions/${questionId}/answers`, 'POST', {body: data})
+    revalidatePath(`/questions/${questionId}`)
+    return result
 }
