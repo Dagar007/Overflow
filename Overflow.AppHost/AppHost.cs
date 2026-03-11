@@ -1,3 +1,4 @@
+#pragma warning disable ASPIRECERTIFICATES001
 using Microsoft.Extensions.Hosting;
 
 var builder = DistributedApplication.CreateBuilder(args);
@@ -5,12 +6,14 @@ var builder = DistributedApplication.CreateBuilder(args);
 var compose = builder.AddDockerComposeEnvironment("production")
     .WithDashboard(dashboard => dashboard.WithHostPort(8080));
 
+
 var keycloak = builder.AddKeycloak("keycloak", 6001)
     .WithEnvironment("KC_HTTP_ENABLED", "true")
     .WithEnvironment("KC_HOSTNAME_STRICT", "false")
     .WithEnvironment("VIRTUAL_HOST", "id.overflow.local")
     .WithEnvironment("VIRTUAL_PORT", "8080")
     .WithDataVolume("keycloak-data")
+    .WithoutHttpsCertificate()
     .WithRealmImport("../infra/realms");
 
 var postgres = builder.AddPostgres("postgres", port:5432)
@@ -66,22 +69,32 @@ if (builder.Environment.IsDevelopment())
 else
 {
    yarp
-   .WithEnvironment("ASPNETCORE_URLS", "http://*:8001")
-   .WithEndpoint(port: 8001, scheme: "http", targetPort: 8001, name: "gateway", isExternal: true)
-   .WithEnvironment("VIRTUAL_HOST", "api.overflow.local")
-   .WithEnvironment("VIRTUAL_PORT", "8001");
+       .WithoutHttpsCertificate()
+       .WithEnvironment("ASPNETCORE_URLS", "http://*:8001")
+       .WithEndpoint(port: 8001, scheme: "http", targetPort: 8001, name: "gateway", isExternal: true)
+       .WithEnvironment("VIRTUAL_HOST", "api.overflow.local")
+       .WithEnvironment("VIRTUAL_PORT", "8001");
 }
-   
 
-var webapp = builder.AddNpmApp("webapp", "../webapp", "dev")
+
+var webapp = builder.AddJavaScriptApp("webapp", "../webapp")
     .WithReference(keycloak)
-    .WithHttpEndpoint(env: "PORT", port: 3000);
+    .WithHttpEndpoint(env: "PORT", port: 3000, targetPort: 4000)
+    .WithEnvironment("VIRTUAL_HOST", "app.overflow.local")
+    .WithEnvironment("VIRTUAL_PORT", "4000")
+    .PublishAsDockerFile();
 
 if (!builder.Environment.IsDevelopment())
 {
     builder.AddContainer("nginx-proxy", "nginxproxy/nginx-proxy", "1.9")
-        .WithEndpoint(80,  80, "nginx", isExternal: true)
-        .WithBindMount("/var/run/docker.sock", "/tmp/docker.sock", true);
+        .WithEndpoint(80, 80, "nginx", isExternal: true)
+        .WithEndpoint(443, 443, "nginx-ssl", isExternal: true)
+        .WithBindMount("/var/run/docker.sock", "/tmp/docker.sock", true)
+        .WithBindMount("../infra/devcerts", "/etc/nginx/certs", true);
+    
+    keycloak.WithEnvironment("KC_HOSTNAME", "https://id.overflow.local")
+        .WithEnvironment("KC_HOSTNAME_BACKCHANNEL_DYNAMIC", "true");
 }
 
 builder.Build().Run();
+#pragma warning restore ASPIRECERTIFICATES001

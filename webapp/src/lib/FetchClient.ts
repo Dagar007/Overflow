@@ -1,12 +1,13 @@
 ﻿import {notFound} from "next/dist/client/components/not-found";
 import {auth} from "@/auth";
+import {apiConfig} from "@/lib/config";
 
 export async function fetchClient<T>(
     url: string, 
     method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
     options: Omit<RequestInit, 'body'> & {body?: unknown} = {}): Promise<{data: T | null, error?: {message: string, status: number}}> {
     const { body, ...rest } = options;
-    const apiUrl = process.env.API_URL;
+    const apiUrl = apiConfig.apiUrl;
     const session = await auth()
     if (!apiUrl) throw new Error('Missing API URL');
     
