@@ -13,12 +13,13 @@ export default function UserMenu({user}: Props) {
         <Dropdown>
             <DropdownTrigger>
                 <div className='flex items-center gap-2 cursor-pointer'>
-                    <Avatar 
+                    <Avatar
+                        suppressHydrationWarning
                         color='secondary'
                         size='sm'
-                        name={user.name?.charAt(0)}
+                        name={user.displayName?.charAt(0)}
                     />
-                    {user.name}
+                    {user.displayName}
                 </div>
             </DropdownTrigger>
             <DropdownMenu>

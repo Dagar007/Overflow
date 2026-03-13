@@ -1,11 +1,12 @@
 ﻿import {notFound} from "next/dist/client/components/not-found";
 import {auth} from "@/auth";
 import {apiConfig} from "@/lib/config";
+import {FetchResponse} from "@/lib/types";
 
 export async function fetchClient<T>(
     url: string, 
     method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
-    options: Omit<RequestInit, 'body'> & {body?: unknown} = {}): Promise<{data: T | null, error?: {message: string, status: number}}> {
+    options: Omit<RequestInit, 'body'> & {body?: unknown} = {}): Promise<FetchResponse<T>> {
     const { body, ...rest } = options;
     const apiUrl = apiConfig.apiUrl;
     const session = await auth()

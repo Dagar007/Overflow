@@ -58,10 +58,10 @@ export default function AnswerFooter({answer, currentUser}: Props) {
                         answered {timeAgo(answer.createdAt)}
                     </span>
                 <div className="flex items-center gap-3">
-                    <Avatar className='h-6 w-6' color='secondary' name={answer.userDisplayName.charAt(0)}/>
+                    <Avatar className='h-6 w-6' color='secondary' name={answer.author?.displayName?.charAt(0)}/>
                     <div className="flex flex-col item-center">
-                        <span>{answer.userDisplayName}</span>
-                        <span className='self-start text-sm font-semibold'>42</span>
+                        <span>{answer.author?.displayName}</span>
+                        <span className='self-start text-sm font-semibold'>{answer.author?.reputation}</span>
                     </div>
                 </div>
             </div>

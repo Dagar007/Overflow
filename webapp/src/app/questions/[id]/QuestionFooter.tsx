@@ -30,10 +30,10 @@ export default function QuestionFooter({question}: Props) {
                         asked {timeAgo(question.createdAt)}
                     </span>
                 <div className="flex items-center gap-3">
-                    <Avatar className='h-6 w-6' color='secondary' name={question.askerDisplayName.charAt(0)}/>
+                    <Avatar className='h-6 w-6' color='secondary' name={question.author?.displayName?.charAt(0)}/>
                     <div className="flex flex-col item-center">
-                        <span>{question.askerDisplayName}</span>
-                        <span className='self-start text-sm font-semibold'>42</span>
+                        <span>{question.author?.displayName}</span>
+                        <span className='self-start text-sm font-semibold'>{question.author?.reputation}</span>
                     </div>
                 </div>
             </div>
