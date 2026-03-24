@@ -34,6 +34,8 @@ var typesenseContainer = typesense.GetEndpoint("typesense");
 
 var questionDb = postgres.AddDatabase("questionDb");
 var profileDb = postgres.AddDatabase("profileDb");
+var statsDb = postgres.AddDatabase("statsDb");
+var voteDb = postgres.AddDatabase("voteDb");
 
 var rabbitMq = builder.AddRabbitMQ("messaging")
     .WithDataVolume("rabbitmq-data")
@@ -62,6 +64,20 @@ var searchService = builder.AddProject<Projects.SearchService>("search-service")
     .WaitFor(typesense)
     .WaitFor(rabbitMq);
 
+var statsService = builder.AddProject<Projects.StatsService>("stats-service")
+    .WithReference(statsDb)
+    .WithReference(rabbitMq)
+    .WaitFor(statsDb)
+    .WaitFor(rabbitMq);
+
+var voteService = builder.AddProject<Projects.VoteService>("vote-service")
+    .WithReference(keycloak)
+    .WithReference(voteDb)
+    .WithReference(rabbitMq)
+    .WaitFor(keycloak)
+    .WaitFor(voteDb)
+    .WaitFor(rabbitMq);
+
 var yarp = builder.AddYarp("gateway")
     .WithConfiguration(yarpBuilder =>
     {
@@ -70,6 +86,8 @@ var yarp = builder.AddYarp("gateway")
         yarpBuilder.AddRoute("/tags/{**catch-all}", questionService);
         yarpBuilder.AddRoute("/search/{**catch-all}", searchService);
         yarpBuilder.AddRoute("/profiles/{**catch-all}", profileService);
+        yarpBuilder.AddRoute("/stats/{**catch-all}", statsService);
+        yarpBuilder.AddRoute("/votes/{**catch-all}", voteService);
     });
 
 if (builder.Environment.IsDevelopment())

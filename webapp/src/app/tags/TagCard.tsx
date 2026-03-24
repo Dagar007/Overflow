@@ -23,7 +23,7 @@ export default function TagCard({tag}: Props): JSX.Element {
             <CardBody>
                 <p className="line-clamp-3">{tag.description}</p>
             </CardBody>
-            <CardFooter>42 Questions</CardFooter>
+            <CardFooter>{tag.usageCount} {tag.usageCount === 1 ? 'question': 'questions'}</CardFooter>
         </Card>
     );
 }

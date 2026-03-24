@@ -1,11 +1,13 @@
 ﻿'use server';
 
-import {Answer, FetchResponse, Profile, Question} from "@/lib/types";
+import {Answer, FetchResponse, Profile, Question, Vote, VoteRecord} from "@/lib/types";
 import {fetchClient} from "@/lib/FetchClient";
 import {QuestionSchema} from "@/lib/schemas/questionSchema";
 import {AnswerSchema} from "@/lib/schemas/answerSchema";
 import {revalidatePath} from "next/dist/server/web/spec-extension/revalidate";
 import {q} from "framer-motion/m";
+import {auth} from "@/auth";
+import {error} from "next/dist/build/output/log";
 
 export async function getQuestions(tags?: string): Promise<FetchResponse<Question[]>> {
     let questionUrl = '/questions';
@@ -58,20 +60,34 @@ export async function getQuestionById(id: string): Promise<FetchResponse<Questio
     const ids = Array.from(userIds).sort();
     
     const profilesUrl = '/profiles/batch?' + new URLSearchParams({ids: ids.join(',')});
-
+    
     const {data: profiles, error: profileError} = await fetchClient<Profile[]>(profilesUrl, 'GET',
         {cache: 'force-cache', next: {revalidate: 300}});
     
     if (profileError) return {data: null, error: {message: 'Problem fetching profiles.', status: 500}}
 
     const profileMap = new Map(profiles?.map(p => [p.userId, p]))
+
+
+    const session = await auth();
+    let voteMap = new Map<string, number>()
+    if(session) {
+        const voteUrl = `/votes/${id}`
+        const {data: votes, error: votesEror} = await fetchClient<VoteRecord[]>(voteUrl, 'GET')
+        if (votesEror) return { data: null, error: {message: 'Problem fetching votes.', status: 500}}
+        voteMap = new Map((votes?? []).map(v => [v.targetId, v.voteValue]));
+    }
+
+    const getUserVote = (targetId: string) => voteMap.get(targetId) ?? 0;
     
     const enriched: Question = {
         ...question,
+        userVoted: getUserVote(question.id),
         author: profileMap.get(question.askerId),
         answers: (question.answers ?? []).map(a => ({
             ...a, 
-            author: profileMap.get(a.userId)
+            author: profileMap.get(a.userId),
+            userVoted: getUserVote(a.id),
         }))
     }
     
@@ -111,4 +127,16 @@ export async function deleteAnswer(id: string, questionId: string) {
     const result = await fetchClient(`/questions/${questionId}/answers/${id}`, 'DELETE')
     revalidatePath(`/questions/${questionId}`)
     return result
+}
+
+export async function acceptAnswer(answerId: string, questionId: string) {
+    const result = await fetchClient(`/questions/${questionId}/answers/${answerId}/accept`, 'POST');
+    revalidatePath(`/questions/${questionId}`)
+    return result
+}
+
+export async function addVotes(vote: Vote) {
+    const result = await fetchClient('/votes', 'POST', {body: vote});
+    revalidatePath(`/questions/${vote.questionId}`)
+    return result;
 }
