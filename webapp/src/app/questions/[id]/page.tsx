@@ -10,7 +10,7 @@ import {Answer} from "@/lib/types";
 type Params = Promise<{id: string}>
 type SearchParams = Promise<{sort?: string}>
 export default async function QuestionDetailedPage({params, searchParams}: 
-        {params: Params, searchParams: SearchParams}): Promise<void> {
+        {params: Params, searchParams: SearchParams}) {
     const { id } = await params;
     const { sort } = await searchParams;
     const {data: question, error} = await getQuestionById(id)
