@@ -1,7 +1,10 @@
 using Common;
+using Contracts;
 using Microsoft.EntityFrameworkCore;
 using QuestionService.Data;
 using QuestionService.Services;
+using Wolverine.EntityFrameworkCore;
+using Wolverine.Postgresql;
 using Wolverine.RabbitMQ;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,12 +18,23 @@ builder.Services.AddMemoryCache();
 builder.Services.AddScoped<TagService>();
 builder.Services.AddKeyCloakAuth();
 
-builder.AddAzureNpgsqlDbContext<QuestionDbContext>("questionDb");
+var connectionString = builder.Configuration.GetConnectionString("questionDb");
+
+builder.Services.AddDbContext<QuestionDbContext>(options =>
+{
+    options.UseNpgsql(connectionString);
+
+}, optionsLifetime:ServiceLifetime.Singleton);
 
 
 await builder.UseWolverineWithRabbitMqAsync(opts =>
 {
     opts.ApplicationAssembly = typeof(Program).Assembly;
+    opts.PersistMessagesWithPostgresql(connectionString!);
+    opts.UseEntityFrameworkCoreTransactions();
+    opts.PublishMessage<QuestionCreated>().ToRabbitExchange("Contracts.QuestionCreated").UseDurableOutbox();
+    opts.PublishMessage<QuestionUpdated>().ToRabbitExchange("Contracts.QuestionUpdated").UseDurableOutbox();
+    opts.PublishMessage<QuestionDeleted>().ToRabbitExchange("Contracts.QuestionDeleted").UseDurableOutbox();
 });
 
 var app = builder.Build();
@@ -34,18 +48,6 @@ if (app.Environment.IsDevelopment())
 app.MapControllers();
 app.MapDefaultEndpoints();
 
-using var scope = app.Services.CreateScope();
-var services = scope.ServiceProvider;
-
-try
-{
-    var context = services.GetRequiredService<QuestionDbContext>();
-    await context.Database.MigrateAsync();
-}
-catch (Exception ex)
-{
-    var logger = services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "An error occurred seeding the DB.");
-}
+await app.MigrateDbContextAsync<QuestionDbContext>();
 
 app.Run();

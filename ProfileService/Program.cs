@@ -47,19 +47,6 @@ app.MapGet("/profiles/batch", async (string ids, ProfileDbContext db) =>
     return Results.Ok(rows);
 });
 
-
-using var scope = app.Services.CreateScope();
-var services = scope.ServiceProvider;
-
-try
-{
-    var context = services.GetRequiredService<ProfileDbContext>();
-    await context.Database.MigrateAsync();
-}
-catch (Exception ex)
-{
-    var logger = services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "An error occurred seeding the DB.");
-}
+await app.MigrateDbContextAsync<ProfileDbContext>();
 
 app.Run();
